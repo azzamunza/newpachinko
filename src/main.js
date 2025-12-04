@@ -8,6 +8,10 @@ import { PachinkoMachine } from './pachinko.js';
 import { Physics } from './physics.js';
 import { Camera } from './camera.js';
 
+// Game configuration constants
+const INITIAL_BALLS = 10;
+const POWER_CHARGE_RATE = 0.5;
+
 class PachinkoGame {
     constructor() {
         this.canvas = document.getElementById('webgpu-canvas');
@@ -16,7 +20,7 @@ class PachinkoGame {
         this.physics = null;
         this.camera = null;
         this.score = 0;
-        this.ballsRemaining = 10;
+        this.ballsRemaining = INITIAL_BALLS;
         this.launchPower = 0;
         this.isCharging = false;
         this.lastTime = 0;
@@ -185,7 +189,7 @@ class PachinkoGame {
 
     resetGame() {
         this.score = 0;
-        this.ballsRemaining = 10;
+        this.ballsRemaining = INITIAL_BALLS;
         this.scoreElement.textContent = this.score;
         this.ballsElement.textContent = this.ballsRemaining;
         this.pachinko.reset();
@@ -196,7 +200,7 @@ class PachinkoGame {
 
         // Update charging power
         if (this.isCharging) {
-            this.launchPower = Math.min(1, this.launchPower + deltaTime * 0.5);
+            this.launchPower = Math.min(1, this.launchPower + deltaTime * POWER_CHARGE_RATE);
             this.powerFill.style.width = (this.launchPower * 100) + '%';
         }
 

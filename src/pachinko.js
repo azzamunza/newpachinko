@@ -7,6 +7,14 @@ import { mat4 } from './math.js';
 import { PhysicsBody } from './physics.js';
 import { Geometry } from './geometry.js';
 
+// Ball launch configuration constants
+const BASE_LAUNCH_VELOCITY = 5;
+const POWER_VELOCITY_MULTIPLIER = 10;
+const HORIZONTAL_VELOCITY_FACTOR = 0.5;
+const VERTICAL_VELOCITY_FACTOR = 0.3;
+const LAUNCH_RANDOMNESS = 2;
+const BALL_RADIUS = 0.18;
+
 export class PachinkoMachine {
     constructor(renderer, physics) {
         this.renderer = renderer;
@@ -272,31 +280,29 @@ export class PachinkoMachine {
     }
 
     launchBall(power = 0.5) {
-        const ballRadius = 0.18;
-        
         // Launch position (top right of the machine)
         const launchX = this.width / 2 - 0.5;
         const launchY = this.height - 0.5;
         const launchZ = 0;
         
         // Launch velocity (upward and left with some randomness)
-        const baseVelocity = 5 + power * 10;
-        const velocityX = -baseVelocity * 0.5 + (Math.random() - 0.5) * 2;
-        const velocityY = baseVelocity * 0.3;
+        const baseVelocity = BASE_LAUNCH_VELOCITY + power * POWER_VELOCITY_MULTIPLIER;
+        const velocityX = -baseVelocity * HORIZONTAL_VELOCITY_FACTOR + (Math.random() - 0.5) * LAUNCH_RANDOMNESS;
+        const velocityY = baseVelocity * VERTICAL_VELOCITY_FACTOR;
         const velocityZ = 0;
         
         // Create ball physics body
         const ballBody = new PhysicsBody({
             position: [launchX, launchY, launchZ],
             velocity: [velocityX, velocityY, velocityZ],
-            radius: ballRadius,
+            radius: BALL_RADIUS,
             mass: 1,
             type: 'sphere'
         });
         
         // Create ball visual
         const ballVertices = Geometry.createSphere(
-            ballRadius, 16, 12,
+            BALL_RADIUS, 16, 12,
             this.colors.ball
         );
         

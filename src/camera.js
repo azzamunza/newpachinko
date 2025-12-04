@@ -5,14 +5,24 @@
 
 import { mat4, vec3 } from './math.js';
 
+// Camera configuration constants
+const DEFAULT_RADIUS = 15;
+const DEFAULT_THETA = 0;
+const DEFAULT_PHI = 0.3;
+const MIN_RADIUS = 5;
+const MAX_RADIUS = 30;
+const MIN_PHI = -Math.PI / 3;
+const MAX_PHI = Math.PI / 2.5;
+const FIELD_OF_VIEW = Math.PI / 4; // 45 degrees
+
 export class Camera {
     constructor(canvas) {
         this.canvas = canvas;
         
         // Camera position in spherical coordinates
-        this.radius = 15;
-        this.theta = 0; // horizontal angle
-        this.phi = 0.3; // vertical angle
+        this.radius = DEFAULT_RADIUS;
+        this.theta = DEFAULT_THETA; // horizontal angle
+        this.phi = DEFAULT_PHI; // vertical angle
         
         // Camera target (what we're looking at)
         this.target = [0, 3, 0];
@@ -21,29 +31,28 @@ export class Camera {
         this.viewMatrix = mat4.create();
         this.projectionMatrix = mat4.create();
         
-        // Limits
-        this.minRadius = 5;
-        this.maxRadius = 30;
-        this.minPhi = -Math.PI / 3;
-        this.maxPhi = Math.PI / 2.5;
+        // Track canvas size for efficient projection updates
+        this.lastWidth = canvas.clientWidth;
+        this.lastHeight = canvas.clientHeight;
         
-        this.updateMatrices();
+        this.updateViewMatrix();
+        this.updateProjectionMatrix();
     }
 
     rotate(deltaTheta, deltaPhi) {
         this.theta += deltaTheta;
-        this.phi = Math.max(this.minPhi, Math.min(this.maxPhi, this.phi + deltaPhi));
-        this.updateMatrices();
+        this.phi = Math.max(MIN_PHI, Math.min(MAX_PHI, this.phi + deltaPhi));
+        this.updateViewMatrix();
     }
 
     zoom(delta) {
-        this.radius = Math.max(this.minRadius, Math.min(this.maxRadius, this.radius + delta));
-        this.updateMatrices();
+        this.radius = Math.max(MIN_RADIUS, Math.min(MAX_RADIUS, this.radius + delta));
+        this.updateViewMatrix();
     }
 
     setTarget(x, y, z) {
         this.target = [x, y, z];
-        this.updateMatrices();
+        this.updateViewMatrix();
     }
 
     getPosition() {
@@ -57,21 +66,21 @@ export class Camera {
         ];
     }
 
-    updateMatrices() {
+    updateViewMatrix() {
         const position = this.getPosition();
-        
-        // View matrix (lookAt)
         mat4.lookAt(
             this.viewMatrix,
             position,
             this.target,
             [0, 1, 0] // up vector
         );
+    }
 
-        // Projection matrix (perspective)
+    updateProjectionMatrix() {
         const aspect = this.canvas.clientWidth / this.canvas.clientHeight;
-        const fov = Math.PI / 4; // 45 degrees
-        mat4.perspective(this.projectionMatrix, fov, aspect, 0.1, 100);
+        mat4.perspective(this.projectionMatrix, FIELD_OF_VIEW, aspect, 0.1, 100);
+        this.lastWidth = this.canvas.clientWidth;
+        this.lastHeight = this.canvas.clientHeight;
     }
 
     getViewMatrix() {
@@ -79,7 +88,11 @@ export class Camera {
     }
 
     getProjectionMatrix() {
-        this.updateMatrices(); // Update on every frame for aspect ratio changes
+        // Only update projection if canvas size has changed
+        if (this.canvas.clientWidth !== this.lastWidth || 
+            this.canvas.clientHeight !== this.lastHeight) {
+            this.updateProjectionMatrix();
+        }
         return this.projectionMatrix;
     }
 }

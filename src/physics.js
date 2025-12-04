@@ -5,6 +5,10 @@
 
 import { vec3 } from './math.js';
 
+// Physics configuration constants
+const VELOCITY_THRESHOLD = 0.1;
+const PERTURBATION_STRENGTH = 0.1;
+
 export class Physics {
     constructor() {
         this.gravity = -15; // Gravity acceleration (stronger for game feel)
@@ -60,8 +64,8 @@ export class Physics {
             }
 
             // Add slight random perturbation for more interesting physics
-            if (Math.abs(body.velocity[0]) > 0.1 || Math.abs(body.velocity[1]) > 0.1) {
-                body.velocity[0] += (Math.random() - 0.5) * 0.1;
+            if (Math.abs(body.velocity[0]) > VELOCITY_THRESHOLD || Math.abs(body.velocity[1]) > VELOCITY_THRESHOLD) {
+                body.velocity[0] += (Math.random() - 0.5) * PERTURBATION_STRENGTH;
             }
         }
     }
