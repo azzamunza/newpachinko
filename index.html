@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Pachinko Machine - WebGPU</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="webgpu-canvas"></canvas>
+        <div id="ui-overlay">
+            <div id="score-panel">
+                <h2>Score: <span id="score">0</span></h2>
+                <p>Balls: <span id="balls-remaining">10</span></p>
+            </div>
+            <div id="controls-panel">
+                <button id="launch-btn">Launch Ball</button>
+                <div id="power-meter">
+                    <div id="power-fill"></div>
+                </div>
+                <p>Hold SPACE to charge, release to launch</p>
+            </div>
+            <div id="info-panel">
+                <h3>Controls:</h3>
+                <ul>
+                    <li>Mouse drag: Rotate camera</li>
+                    <li>Scroll: Zoom in/out</li>
+                    <li>SPACE: Launch ball</li>
+                    <li>R: Reset game</li>
+                </ul>
+            </div>
+        </div>
+        <div id="error-message" class="hidden">
+            <h2>WebGPU Not Supported</h2>
+            <p>Your browser does not support WebGPU. Please use a compatible browser like Chrome 113+ or Edge 113+.</p>
+        </div>
+    </div>
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
